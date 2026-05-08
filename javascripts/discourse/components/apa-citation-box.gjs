@@ -9,10 +9,13 @@ export default class ApaCitationBox extends Component {
     return this.args.outletArgs?.model;
   }
 
-  // Güvenli Dil Kontrolü
-  get isTurkish() {
+  get safeLocale() {
     const locale = I18n.currentLocale() || "en";
-    return locale.toLowerCase().startsWith("tr");
+    return locale.replace(/_/g, "-");
+  }
+
+  get isTurkish() {
+    return this.safeLocale.toLowerCase().startsWith("tr");
   }
 
   get noDateString() {
@@ -21,6 +24,11 @@ export default class ApaCitationBox extends Component {
 
   get copyTitle() {
     return this.isTurkish ? "Kopyala" : "Copy";
+  }
+
+  get siteName() {
+    // Template içinde window kullanılamadığı için bilgiyi JS tarafında çekiyoruz
+    return window.location.hostname;
   }
 
   get authorApaName() {
@@ -42,7 +50,6 @@ export default class ApaCitationBox extends Component {
     }
   }
 
-  // DOM'daki 'data-time' verisini kullanarak sonsuz döngüyü önleyen güvenli tarih fonksiyonu
   get publicationDate() {
     const createdAt = this.topic?.created_at;
     if (!createdAt) return this.noDateString;
@@ -51,16 +58,13 @@ export default class ApaCitationBox extends Component {
       const date = new Date(createdAt);
       const year = date.getFullYear();
       const day = date.getDate();
-      const monthIndex = date.getMonth(); // 0 ile 11 arası ay indeksi
+      const monthIndex = date.getMonth(); 
       
-      // Sitenizi çökerterek sonsuz döngüye sokan tarayıcı Intl API'sini devreden çıkardık.
-      // Bunun yerine doğrudan hatasız bir statik sözlük kullanıyoruz.
       const monthsEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       const monthsTr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
       const monthName = this.isTurkish ? monthsTr[monthIndex] : monthsEn[monthIndex];
 
-      // APA Formatı: TR için (Yıl, Gün Ay), EN için (Year, Month Day)
       return this.isTurkish 
         ? `${year}, ${day} ${monthName}` 
         : `${year}, ${monthName} ${day}`;
@@ -79,7 +83,7 @@ export default class ApaCitationBox extends Component {
   }
 
   get fullCitation() {
-    return `${this.authorApaName} (${this.publicationDate}). ${this.topicTitle}. ${window.location.hostname}. ${this.topicUrl}`;
+    return `${this.authorApaName} (${this.publicationDate}). ${this.topicTitle}. ${this.siteName}. ${this.topicUrl}`;
   }
 
   @action
@@ -97,7 +101,8 @@ export default class ApaCitationBox extends Component {
             <span class="apa-author">{{this.authorApaName}}</span>
             <span class="apa-year">({{this.publicationDate}}).</span>
             <span class="apa-topic-title"><i>{{this.topicTitle}}</i>.</span>
-            <span class="apa-site">{{window.location.hostname}}.</span>
+            {{! window object'i yerine safe getter olan this.siteName'i cagiriyoruz }}
+            <span class="apa-site">{{this.siteName}}.</span>
             <a href={{this.topicUrl}} class="apa-url">{{this.topicUrl}}</a>
           </div>
           <button class="btn btn-default apa-copy-icon-only" type="button" {{on "click" this.copyToClipboard}} title={{this.copyTitle}}>
