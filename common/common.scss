@@ -1,44 +1,42 @@
-.apa-citation-container {
+.apa-citation-container.inline-layout {
   background-color: var(--blend-primary-secondary-5);
-  border: 1px solid var(--primary-low);
+  border-left: 4px solid var(--tertiary); // Akademik bir vurgu için sol kenarlık
+  padding: 12px 15px;
+  margin: 15px 0;
   border-radius: 4px;
-  padding: 15px;
-  margin: 20px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  .apa-citation-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--primary-low);
-    padding-bottom: 8px;
-
-    .apa-title {
-      font-weight: bold;
-      color: var(--primary-medium);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-  }
 
   .apa-citation-content {
-    font-family: var(--font-family);
-    color: var(--primary);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    font-size: var(--font-down-1);
     line-height: 1.5;
-    word-break: break-word;
 
-    .apa-topic-title {
-      font-style: italic;
+    .apa-full-text {
+      color: var(--primary);
+      word-break: break-word;
+      
+      .apa-topic-title {
+        font-style: italic;
+      }
     }
-    
-    .apa-url {
-      color: var(--tertiary);
-      text-decoration: none;
+
+    .apa-copy-btn-compact {
+      background: var(--primary-low);
+      border: none;
+      padding: 6px 10px;
+      transition: background 0.2s;
+      flex-shrink: 0; // Butonun sıkışmasını engeller
+
       &:hover {
-        text-decoration: underline;
+        background: var(--primary-low-mid);
+        color: var(--tertiary);
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
       }
     }
   }

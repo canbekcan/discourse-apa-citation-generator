@@ -2,21 +2,25 @@ import Component from "@glimmer/component";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import dIcon from "discourse-common/helpers/d-icon";
+import I18n from "discourse-i18n";
 
 export default class ApaCitationBox extends Component {
   get topic() {
-    // outletArgs üzerinden o anki Topic modeline erişim sağlanır.
     return this.args.outletArgs?.model;
+  }
+
+  // Kullanıcının seçtiği dile göre "tarih yok" ifadesi
+  get noDateString() {
+    const locale = I18n.currentLocale();
+    return locale === "tr" ? "t.y." : "n.d.";
   }
 
   get authorApaName() {
     const creator = this.topic?.details?.created_by;
-    if (!creator) return "Yazar Bilinmiyor";
+    if (!creator) return I18n.t("unknown");
     
-    // Yazarın Discourse profilindeki "Ad Soyad" (name) alanını önceliklendiriyoruz.
-    // Yoksa kullanıcı adını (username) baz alır.
     const fullName = creator.name || creator.username;
-    const parts = fullName.trim().split(" ");
+    const parts = fullName.trim().split(/\s+/);
     
     if (parts.length > 1) {
       const lastName = parts.pop();
@@ -26,17 +30,30 @@ export default class ApaCitationBox extends Component {
     return fullName;
   }
 
-  get publicationYear() {
-    if (!this.topic?.created_at) return new Date().getFullYear();
-    return new Date(this.topic.created_at).getFullYear();
+  // Dile duyarlı tarih fonksiyonu
+  get publicationDate() {
+    if (!this.topic?.created_at) return this.noDateString;
+    
+    const date = new Date(this.topic.created_at);
+    const locale = I18n.currentLocale();
+    
+    const year = date.getFullYear();
+    const day = date.getDate();
+    const month = date.toLocaleString(locale, { month: 'long' });
+
+    // APA formatı: İngilizce için (Year, Month Day), Türkçe için (Yıl, Gün Ay)
+    return locale === "en" 
+      ? `${year}, ${month} ${day}` 
+      : `${year}, ${day} ${month}`;
   }
 
   get topicTitle() {
+    // Discourse zaten aktif dile göre başlığı getirir
     return this.topic?.title;
   }
 
   get topicUrl() {
-    return `${window.location.origin}/t/${this.topic?.slug}/${this.topic?.id}`;
+    return `${window.location.origin}${this.topic?.url}`;
   }
 
   get siteName() {
@@ -44,32 +61,29 @@ export default class ApaCitationBox extends Component {
   }
 
   get fullCitation() {
-    return `${this.authorApaName} (${this.publicationYear}). ${this.topicTitle}. ${this.siteName}. ${this.topicUrl}`;
+    return `${this.authorApaName} (${this.publicationDate}). ${this.topicTitle}. ${this.siteName}. ${this.topicUrl}`;
   }
 
   @action
   copyToClipboard() {
-    navigator.clipboard.writeText(this.fullCitation).then(() => {
-      // Modern tarayıcılarda panoya kopyalama işlemi başarılı.
-      // Dilerseniz buraya bir Toast/Alert bildirimi entegre edebilirsiniz.
-    });
+    navigator.clipboard.writeText(this.fullCitation);
+    // İsteğe bağlı: Kopyalandı bildirimi eklenebilir
   }
 
   <template>
     {{#if this.topic}}
-      <div class="apa-citation-container">
-        <div class="apa-citation-header">
-          <span class="apa-title">{{dIcon "graduation-cap"}} Bu İçeriğe Atıf Yapın (APA Formatı)</span>
-          <button class="btn btn-default apa-copy-btn" type="button" {{on "click" this.copyToClipboard}}>
-            {{dIcon "copy"}} Kopyala
-          </button>
-        </div>
+      <div class="apa-citation-container inline-layout">
         <div class="apa-citation-content">
-          <span class="apa-author">{{this.authorApaName}}</span>
-          <span class="apa-year">({{this.publicationYear}}).</span>
-          <span class="apa-topic-title"><i>{{this.topicTitle}}</i>.</span>
-          <span class="apa-site">{{this.siteName}}.</span>
-          <a href={{this.topicUrl}} class="apa-url">{{this.topicUrl}}</a>
+          <span class="apa-full-text">
+            <span class="apa-author">{{this.authorApaName}}</span>
+            <span class="apa-year">({{this.publicationDate}}).</span>
+            <span class="apa-topic-title"><i>{{this.topicTitle}}</i>.</span>
+            <span class="apa-site">{{this.siteName}}.</span>
+            <a href={{this.topicUrl}} class="apa-url">{{this.topicUrl}}</a>
+          </span>
+          <button class="btn btn-default apa-copy-btn-compact" type="button" {{on "click" this.copyToClipboard}} title={{I18n.t "copy_to_clipboard"}}>
+            {{dIcon "copy"}}
+          </button>
         </div>
       </div>
     {{/if}}
