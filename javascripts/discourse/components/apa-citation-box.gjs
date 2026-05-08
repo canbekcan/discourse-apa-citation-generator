@@ -9,21 +9,24 @@ export default class ApaCitationBox extends Component {
     return this.args.outletArgs?.model;
   }
 
+  // Discourse'un dil kodunu (örn: tr_TR) tarayıcının desteklediği bcp-47 formatına (tr-TR) çevirir
   get safeLocale() {
     const locale = I18n.currentLocale() || "en";
     return locale.replace(/_/g, "-");
   }
 
-  get isTurkish() {
-    return this.safeLocale.toLowerCase().startsWith("tr");
-  }
-
-  get noDateString() {
-    return this.isTurkish ? "t.y." : "n.d.";
-  }
-
+  // Discourse'un çekirdeğinde halihazırda var olan çeviri anahtarlarını kullanıyoruz.
+  // Bu sayede dil dosyası (.yml) oluşturmamıza gerek kalmıyor.
   get copyTitle() {
-    return this.isTurkish ? "Kopyala" : "Copy";
+    return I18n.t("share.copy", { defaultValue: "Copy" });
+  }
+
+  get unknownAuthorText() {
+    return I18n.t("user.unknown", { defaultValue: "Unknown" });
+  }
+
+  get noDateText() {
+    return I18n.t("not_found", { defaultValue: "n.d." });
   }
 
   get siteName() {
@@ -33,7 +36,7 @@ export default class ApaCitationBox extends Component {
   get authorApaName() {
     try {
       const creator = this.topic?.details?.created_by;
-      if (!creator) return this.isTurkish ? "Bilinmeyen Yazar" : "Unknown Author";
+      if (!creator) return this.unknownAuthorText;
       
       const fullName = creator.name || creator.username || "";
       const parts = fullName.trim().split(/\s+/);
@@ -49,26 +52,24 @@ export default class ApaCitationBox extends Component {
     }
   }
 
+  // Tarayıcının yerleşik Intl API'si, o anki Discourse diline (safeLocale) göre
+  // doğru tarih kelimelerini ve gün/ay sıralamasını otomatik olarak yapar.
   get publicationDate() {
     const createdAt = this.topic?.created_at;
-    if (!createdAt) return this.noDateString;
+    if (!createdAt) return this.noDateText;
     
     try {
       const date = new Date(createdAt);
-      const year = date.getFullYear();
-      const day = date.getDate();
-      const monthIndex = date.getMonth(); 
       
-      const monthsEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      const monthsTr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+      return new Intl.DateTimeFormat(this.safeLocale, { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }).format(date);
 
-      const monthName = this.isTurkish ? monthsTr[monthIndex] : monthsEn[monthIndex];
-
-      return this.isTurkish 
-        ? `${year}, ${day} ${monthName}` 
-        : `${year}, ${monthName} ${day}`;
     } catch (e) {
-      return this.noDateString;
+      // Intl API desteklemeyen eski tarayıcılar için (Örn: 2026-03-16)
+      return createdAt.split("T")[0];
     }
   }
 
