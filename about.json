@@ -1,8 +1,8 @@
 {
   "name": "BEKCAN - APA Citation Generator",
+  "component": true,
   "about_url": "https://github.com/canbekcan/discourse-apa-citation-generator",
   "license_url": "https://opensource.org/licenses/MIT",
   "theme_version": "1.0",
-  "minimum_discourse_version": "3.1.0",
-  "components": ["javascripts/discourse/api-initializers/apa-citation-initializer.js"]
+  "minimum_discourse_version": "3.1.0"
 }
