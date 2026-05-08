@@ -18,6 +18,11 @@ export default class ApaCitationBox extends Component {
     return this.currentLocale === "tr" ? "t.y." : "n.d.";
   }
 
+  // Template içindeki çökmeyi önleyen buton hover metni
+  get copyTitle() {
+    return this.currentLocale === "tr" ? "Kopyala" : "Copy";
+  }
+
   get authorApaName() {
     try {
       const creator = this.topic?.details?.created_by;
@@ -46,14 +51,19 @@ export default class ApaCitationBox extends Component {
       const year = date.getFullYear();
       const day = date.getDate();
       
-      // Intl kullanımı hataya karşı daha dirençlidir
-      const month = new Intl.DateTimeFormat(this.currentLocale, { month: 'long' }).format(date);
+      let month = "";
+      try {
+         // Intl motoru dil değişim anında hata verirse diye try-catch içinde tutuyoruz
+         month = new Intl.DateTimeFormat(this.currentLocale, { month: 'long' }).format(date);
+      } catch(err) {
+         month = date.toLocaleString('en', { month: 'long' });
+      }
 
       return this.currentLocale === "en" 
         ? `${year}, ${month} ${day}` 
         : `${year}, ${day} ${month}`;
     } catch (e) {
-      return createdAt.split('T')[0]; // Hata durumunda basit tarih döndür (YYYY-MM-DD)
+      return this.noDateString;
     }
   }
 
@@ -79,16 +89,16 @@ export default class ApaCitationBox extends Component {
 
   <template>
     {{#if this.topic}}
-      <div class="apa-citation-container-v2">
-        <div class="apa-citation-wrapper">
-          <div class="apa-citation-text">
+      <div class="apa-citation-container inline-layout">
+        <div class="apa-citation-content">
+          <span class="apa-full-text">
             <span class="apa-author">{{this.authorApaName}}</span>
             <span class="apa-year">({{this.publicationDate}}).</span>
             <span class="apa-topic-title"><i>{{this.topicTitle}}</i>.</span>
             <span class="apa-site">{{window.location.hostname}}.</span>
             <a href={{this.topicUrl}} class="apa-url">{{this.topicUrl}}</a>
-          </div>
-          <button class="btn btn-default apa-copy-icon-only" type="button" {{on "click" this.copyToClipboard}}>
+          </span>
+          <button class="btn btn-default apa-copy-btn-compact" type="button" {{on "click" this.copyToClipboard}} title={{this.copyTitle}}>
             {{dIcon "copy"}}
           </button>
         </div>
