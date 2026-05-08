@@ -1,0 +1,45 @@
+.apa-citation-container {
+  background-color: var(--blend-primary-secondary-5);
+  border: 1px solid var(--primary-low);
+  border-radius: 4px;
+  padding: 15px;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .apa-citation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--primary-low);
+    padding-bottom: 8px;
+
+    .apa-title {
+      font-weight: bold;
+      color: var(--primary-medium);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  }
+
+  .apa-citation-content {
+    font-family: var(--font-family);
+    color: var(--primary);
+    line-height: 1.5;
+    word-break: break-word;
+
+    .apa-topic-title {
+      font-style: italic;
+    }
+    
+    .apa-url {
+      color: var(--tertiary);
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
