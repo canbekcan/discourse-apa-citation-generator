@@ -1,54 +1,42 @@
-.apa-citation-container-v2 {
+.apa-citation-container.inline-layout {
   background-color: var(--blend-primary-secondary-5);
-  border-left: 3px solid var(--tertiary);
-  padding: 10px 15px;
+  border-left: 4px solid var(--tertiary); // Akademik bir vurgu için sol kenarlık
+  padding: 12px 15px;
   margin: 15px 0;
   border-radius: 4px;
 
-  .apa-citation-wrapper {
+  .apa-citation-content {
     display: flex;
-    align-items: center; // Butonu dikeyde ortalar
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
+    gap: 15px;
+    font-size: var(--font-down-1);
+    line-height: 1.5;
 
-    .apa-citation-text {
-      font-size: var(--font-down-1);
-      line-height: 1.4;
+    .apa-full-text {
       color: var(--primary);
       word-break: break-word;
-
+      
       .apa-topic-title {
         font-style: italic;
       }
-      
-      .apa-url {
-        color: var(--tertiary);
-        text-decoration: none;
-        &:hover { text-decoration: underline; }
-      }
     }
 
-    .apa-copy-icon-only {
+    .apa-copy-btn-compact {
       background: var(--primary-low);
-      border: 1px solid var(--primary-low-mid);
-      padding: 5px 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0; // Butonun ezilmesini önler
-      border-radius: 4px;
-      height: 30px;
-      width: 34px;
+      border: none;
+      padding: 6px 10px;
+      transition: background 0.2s;
+      flex-shrink: 0; // Butonun sıkışmasını engeller
 
       &:hover {
         background: var(--primary-low-mid);
-        svg { fill: var(--tertiary); }
+        color: var(--tertiary);
       }
 
       svg {
         width: 14px;
         height: 14px;
-        fill: var(--primary-medium);
       }
     }
   }
