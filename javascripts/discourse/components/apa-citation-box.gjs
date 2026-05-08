@@ -27,7 +27,6 @@ export default class ApaCitationBox extends Component {
   }
 
   get siteName() {
-    // Template içinde window kullanılamadığı için bilgiyi JS tarafında çekiyoruz
     return window.location.hostname;
   }
 
@@ -95,17 +94,16 @@ export default class ApaCitationBox extends Component {
 
   <template>
     {{#if this.topic}}
-      <div class="apa-citation-container-v2">
+      <div class="apa-citation-box-container">
         <div class="apa-citation-wrapper">
           <div class="apa-citation-text">
             <span class="apa-author">{{this.authorApaName}}</span>
             <span class="apa-year">({{this.publicationDate}}).</span>
             <span class="apa-topic-title"><i>{{this.topicTitle}}</i>.</span>
-            {{! window object'i yerine safe getter olan this.siteName'i cagiriyoruz }}
             <span class="apa-site">{{this.siteName}}.</span>
             <a href={{this.topicUrl}} class="apa-url">{{this.topicUrl}}</a>
           </div>
-          <button class="btn btn-default apa-copy-icon-only" type="button" {{on "click" this.copyToClipboard}} title={{this.copyTitle}}>
+          <button class="btn btn-default apa-copy-btn" type="button" {{on "click" this.copyToClipboard}} title={{this.copyTitle}}>
             {{dIcon "copy"}}
           </button>
         </div>
