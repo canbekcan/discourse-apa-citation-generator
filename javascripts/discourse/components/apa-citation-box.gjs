@@ -12,7 +12,7 @@ export default class ApaCitationBox extends Component {
   // Kullanıcının seçtiği dile göre "tarih yok" ifadesi
   get noDateString() {
     const locale = I18n.currentLocale();
-    return locale === "tr" ? "t.y." : "n.d.";
+    return locale === "tr_TR" ? "t.y." : "n.d.";
   }
 
   get authorApaName() {
